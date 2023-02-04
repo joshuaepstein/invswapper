@@ -29,7 +29,6 @@ import uk.joshuaepstein.invswapper.container.StatueContainer;
 import uk.joshuaepstein.invswapper.container.slot.ReadOnlySlot;
 import uk.joshuaepstein.invswapper.container.slot.player.ArmorViewSlot;
 import uk.joshuaepstein.invswapper.container.slot.player.OffHandSlot;
-import uk.joshuaepstein.invswapper.integrations.IntegrationsCurios;
 import uk.joshuaepstein.invswapper.util.UIHelper;
 
 import javax.annotation.Nullable;
@@ -232,9 +231,6 @@ public class StatueScreen extends AbstractContainerScreen<StatueContainer> {
 //		UIHelper.drawContainerBordersGUIStyle(this, stack, paddingBounds);
 		UIHelper.drawContainerBordersGUIStyle(this, stack, this.getArmorSlotsBoxBounds());
 		UIHelper.drawContainerBordersGUIStyle(this, stack, this.getMainAndOffhandBoxBounds());
-		if(IntegrationsCurios.curiosLoaded){
-			UIHelper.drawContainerBordersGUIStyle(this, stack, this.getCuriosBounds());
-		}
 	}
 
 	private void renderArmorSlots(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
@@ -332,19 +328,8 @@ public class StatueScreen extends AbstractContainerScreen<StatueContainer> {
 		return new Rectangle(-playerBoxWidth-10, 0, playerBoxWidth, 108);
 	}
 
-	public Rectangle getCuriosBounds() {
-		int curiosWidth = 30;
-		return new Rectangle(-curiosWidth-10, 0, curiosWidth, 30*3);
-	}
-
 	private Rectangle getSlotBox(Slot slot) {
 		return new Rectangle(slot.x - 1, slot.y - 1, 18, 18);
-	}
-
-	private void renderIntegrations(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
-		if(IntegrationsCurios.curiosLoaded){
-			IntegrationsCurios.renderCurios(this, this.getCuriosBounds(), stack, mouseX, mouseY, partialTicks);
-		}
 	}
 
 	private void renderContainerBox(PoseStack stack, int mouseX, int mouseY, float partialTicks) {

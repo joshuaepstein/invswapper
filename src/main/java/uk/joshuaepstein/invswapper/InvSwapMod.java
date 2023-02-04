@@ -5,11 +5,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 import uk.joshuaepstein.invswapper.init.ModBlocks;
-import uk.joshuaepstein.invswapper.integrations.IntegrationsCurios;
 
 @Mod(InvSwapMod.MOD_ID)
 public class InvSwapMod {
@@ -25,8 +23,6 @@ public class InvSwapMod {
 
 	public InvSwapMod() {
 		MinecraftForge.EVENT_BUS.register(this);
-		if(ModList.get().isLoaded("curios"))
-			IntegrationsCurios.curiosLoaded();
 	}
 
 	public static ResourceLocation id(String name) {
