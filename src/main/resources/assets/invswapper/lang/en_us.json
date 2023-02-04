@@ -2,5 +2,7 @@
   "container.statue": "Statue Inventory",
   "itemGroup.invswapper": "Inventory Swapper",
   "block.invswapper.inv_armor_stand": "Inventory Armor Stand",
-  "message.statue.notenoughxp": "You do not have enough levels to swap inventories with this statue."
+  "message.statue.notenoughxp": "You do not have enough levels to swap inventories with this statue.",
+  "item.invswapper.size_key": "Model Size Key",
+  "message.invswapper.inv_armor_stand.not_owner": "You are not the owner of this statue!"
 }

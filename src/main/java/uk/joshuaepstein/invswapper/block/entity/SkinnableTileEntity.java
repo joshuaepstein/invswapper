@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
  * @author Team Iskallia - Vault Hunters 1.18.2
  */
 public abstract class SkinnableTileEntity extends BlockEntity {
-  protected SkinProfile skin;
+  public SkinProfile skin;
   
   public SkinnableTileEntity(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
     super(tileEntityTypeIn, pos, state);

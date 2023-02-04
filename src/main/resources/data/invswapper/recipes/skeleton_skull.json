@@ -1,0 +1,23 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "EGE",
+        "GBG",
+        "EGE"
+    ],
+    "key": {
+        "E": {
+            "item": "minecraft:bone_block"
+        },
+        "G": {
+            "item": "minecraft:light_gray_wool"
+        },
+        "B": {
+            "item": "minecraft:diamond"
+        }
+    },
+    "result": {
+        "item": "minecraft:skeleton_skull",
+        "count": 1
+    }
+}

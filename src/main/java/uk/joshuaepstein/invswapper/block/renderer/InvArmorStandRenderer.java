@@ -62,12 +62,8 @@ public class InvArmorStandRenderer implements BlockEntityRenderer<InvArmorStandB
 		SkinProfile skin = tileEntity.getSkin();
 		ResourceLocation skinLocation = StringUtil.isNullOrEmpty(skin.getLatestNickname()) ? STONE_SKIN : skin.getLocationSkin();
 		RenderType renderType = PLAYER_MODEL.renderType(skinLocation);
-		PLAYER_MODEL.young = true;
+		PLAYER_MODEL.young = tileEntity.getSmall();
 		PLAYER_MODEL.setAllVisible(true);
-		PLAYER_MODEL.leftArm.xRot = -120.0F;
-		PLAYER_MODEL.leftSleeve.xRot = -120.0F;
-		PLAYER_MODEL.rightArm.xRot = -120.0F;
-		PLAYER_MODEL.rightSleeve.xRot = -120.0F;
 		PLAYER_MODEL.head.zRot = 0.0F;
 		PLAYER_MODEL.hat.zRot = 0.0F;
 

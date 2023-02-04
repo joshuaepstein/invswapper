@@ -30,6 +30,7 @@ import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import uk.joshuaepstein.invswapper.container.StatueContainer;
 import uk.joshuaepstein.invswapper.init.ModBlocks;
+import uk.joshuaepstein.invswapper.init.ModItems;
 
 import java.util.UUID;
 
@@ -38,6 +39,7 @@ public class InvArmorStandBE extends SkinnableTileEntity {
 	private Inventory inventory = new Inventory(null);
 	private ItemStack standItem;
 	private BlockState stand = Blocks.SMOOTH_STONE_SLAB.defaultBlockState();
+	private boolean isSmall = true;
 
 	public InvArmorStandBE(BlockPos pos, BlockState state) {
 		super(ModBlocks.INV_ARMOR_STAND_BE, pos, state);
@@ -85,6 +87,8 @@ public class InvArmorStandBE extends SkinnableTileEntity {
 		}
 		if (tag.contains("Stand"))
 			this.stand = NbtUtils.readBlockState(tag.getCompound("Stand"));
+		if (tag.contains("IsSmall"))
+			this.isSmall = tag.getBoolean("IsSmall");
 	}
 
 	@Override
@@ -100,6 +104,8 @@ public class InvArmorStandBE extends SkinnableTileEntity {
 		tag.put("Inventory", invTag);
 		if (this.stand.getBlock() != Blocks.SMOOTH_STONE_SLAB)
 			tag.put("Stand", NbtUtils.writeBlockState(this.stand));
+		tag.putBoolean("IsSmall", this.isSmall);
+
 	}
 
 	@Override
@@ -111,7 +117,13 @@ public class InvArmorStandBE extends SkinnableTileEntity {
 		if (this.owner != null && !this.owner.equals(player.getUUID()) && !player.isCreative())
 			return null;
 		ItemStack heldItem = player.getMainHandItem();
-		if (player.isSecondaryUseActive()) {
+		if (heldItem.getItem() == ModItems.SIZE_KEY) {
+			this.isSmall = !this.isSmall;
+			level.playSound(null, pos, SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 0.6F, 0.7F);
+			sendUpdates();
+			return InteractionResult.sidedSuccess(level.isClientSide);
+		}
+		if (player.isShiftKeyDown()) {
 			if (level.isClientSide) return InteractionResult.SUCCESS;
 			NetworkHooks.openGui((ServerPlayer) player, new MenuProvider() {
 				@Override
@@ -174,4 +186,14 @@ public class InvArmorStandBE extends SkinnableTileEntity {
 		this.stand = blockItem.getBlock().defaultBlockState();
 		sendUpdates();
 	}
+
+	public boolean getSmall() {
+		return this.isSmall;
+	}
+
+	public void setSmall(boolean isSmall) {
+		this.isSmall = isSmall;
+		sendUpdates();
+	}
+
 }

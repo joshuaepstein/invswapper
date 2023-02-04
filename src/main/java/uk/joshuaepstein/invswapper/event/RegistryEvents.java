@@ -10,6 +10,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import uk.joshuaepstein.invswapper.init.ModBlocks;
 import uk.joshuaepstein.invswapper.init.ModContainers;
+import uk.joshuaepstein.invswapper.init.ModItems;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class RegistryEvents {
@@ -20,9 +21,9 @@ public class RegistryEvents {
 
 	@SubscribeEvent
 	public static void onItemRegister(RegistryEvent.Register<Item> event) {
+		ModItems.registerItems(event);
 		ModBlocks.registerBlockItems(event);
 	}
-
 
 	@SubscribeEvent
 	public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {

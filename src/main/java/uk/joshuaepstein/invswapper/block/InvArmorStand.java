@@ -115,9 +115,16 @@ public class InvArmorStand extends Block implements EntityBlock {
 	public void setPlacedBy(Level level, BlockPos pos, BlockState State, @Nullable LivingEntity placer, ItemStack stack) {
 		if (placer instanceof ServerPlayer serverPlayer) {
 			if (level.getBlockEntity(pos) instanceof InvArmorStandBE invArmorStandBE) {
-				invArmorStandBE.setOwner(serverPlayer);
+				if (stack.hasTag() && stack.getTag().contains("BlockEntityTag")) {
+					if (!stack.getTagElement("BlockEntityTag").contains("Owner")) {
+						invArmorStandBE.setOwner(serverPlayer);
+					}
+					invArmorStandBE.skin.updateSkin(serverPlayer.getScoreboardName());
+				}	else {
+					invArmorStandBE.setOwner(serverPlayer);
+					invArmorStandBE.skin.updateSkin(serverPlayer.getScoreboardName());
+				}
 			}
-		} else {
 		}
 	}
 
@@ -167,21 +174,6 @@ public class InvArmorStand extends Block implements EntityBlock {
 
 					tooltip.add(TextComponent.EMPTY);
 					if (Screen.hasShiftDown()) {
-//						for (EquipmentSlot slot : EquipmentSlot.values()) {
-//							if (slot.getType() != EquipmentSlot.Type.ARMOR) continue;
-//							ItemStack stack = inv.getItem(39 - (3-slot.getIndex()));
-//							if (!stack.isEmpty()) {
-//								String name = switch (slot) {
-//									case HEAD -> "Helmet";
-//									case CHEST -> "Chestplate";
-//									case LEGS -> "Leggings";
-//									case FEET -> "Boots";
-//									default -> "Unknown";
-//								};
-//								tooltip.add(new TextComponent(name).append(": ").append(stack.getHoverName()).withStyle(ChatFormatting.GRAY));
-//							}
-//						}
-						// For each equipment slot but in reverse order (EquipmentSlot.values())
 						for (int i = 3; i >= 0; i--) {
 							ItemStack stack = inv.getItem(39 - (3-i));
 							if (!stack.isEmpty()) {
@@ -204,8 +196,9 @@ public class InvArmorStand extends Block implements EntityBlock {
 								tooltip.add(new TextComponent(name).withStyle(ChatFormatting.GRAY).append(": ").append(new TextComponent("Empty").withStyle(style -> style.withColor(ChatFormatting.WHITE))));
 							}
 						}
+						tooltip.add(new TextComponent("+ More").withStyle(ChatFormatting.GRAY));
 					} else {
-						tooltip.add(new TextComponent("Hold <SHIFT> for more info").withStyle(ChatFormatting.GRAY));
+						tooltip.add(new TextComponent("Hold <" + ChatFormatting.WHITE + ChatFormatting.BOLD + "SHIFT" + ChatFormatting.RESET + "> for more info").withStyle(ChatFormatting.GRAY));
 					}
 				}
 			}

@@ -1,5 +1,7 @@
 {
   "variants": {
-    "model": "invswapper:block/statue"
+    "": {
+      "model": "invswapper:block/statue"
+    }
   }
 }

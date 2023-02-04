@@ -11,6 +11,7 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.event.RegistryEvent;
 import uk.joshuaepstein.invswapper.InvSwapMod;
 import uk.joshuaepstein.invswapper.block.InvArmorStand;
+import uk.joshuaepstein.invswapper.block.blockitem.InvArmorStandBlockItem;
 import uk.joshuaepstein.invswapper.block.entity.InvArmorStandBE;
 import uk.joshuaepstein.invswapper.block.renderer.InvArmorStandRenderer;
 
@@ -18,14 +19,20 @@ import java.util.function.Consumer;
 
 public class ModBlocks {
 	public static final InvArmorStand INV_ARMOR_STAND = new InvArmorStand();
+	public static final BlockItem INV_ARMOR_STAND_BLOCKITEM = new InvArmorStandBlockItem(INV_ARMOR_STAND);
+
+	private static void registerBlock(RegistryEvent.Register<Block> event, Block block, ResourceLocation id) {
+		block.setRegistryName(id);
+		event.getRegistry().register(block);
+	}	public static final BlockEntityType<InvArmorStandBE> INV_ARMOR_STAND_BE = BlockEntityType.Builder.of(InvArmorStandBE::new, INV_ARMOR_STAND).build(null);
 
 	public static void registerBlocks(RegistryEvent.Register<Block> event) {
 		registerBlock(event, INV_ARMOR_STAND, InvSwapMod.id("inv_armor_stand"));
 	}
-	private static void registerBlock(RegistryEvent.Register<Block> event, Block block, ResourceLocation id) {
-		block.setRegistryName(id);
-		event.getRegistry().register(block);
-	}public static final BlockEntityType<InvArmorStandBE> INV_ARMOR_STAND_BE = BlockEntityType.Builder.of(InvArmorStandBE::new, INV_ARMOR_STAND).build(null);
+
+	public static void registerBlockItems(RegistryEvent.Register<Item> event) {
+		registerBlockItem(event, INV_ARMOR_STAND, INV_ARMOR_STAND_BLOCKITEM);
+	}
 
 	public static void registerTileEntities(RegistryEvent.Register<BlockEntityType<?>> event) {
 		registerTileEntity(event, INV_ARMOR_STAND_BE, InvSwapMod.id("inv_armor_stand_entity"));
@@ -40,9 +47,7 @@ public class ModBlocks {
 		event.registerBlockEntityRenderer(INV_ARMOR_STAND_BE, InvArmorStandRenderer::new);
 	}
 
-	public static void registerBlockItems(RegistryEvent.Register<Item> event) {
-		registerBlockItem(event, INV_ARMOR_STAND);
-	}
+
 
 	private static void registerBlockItem(RegistryEvent.Register<Item> event, Block block) {
 		registerBlockItem(event, block, 64);

@@ -35,7 +35,7 @@ public class SkinProfile {
   }
 
   public String getLatestNickname() {
-    return "Ale9u3rwf";
+    return latestNickname;
   }
 
   public void updateSkin(@Nullable String name) {

@@ -1,0 +1,20 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "EEE",
+        " G ",
+        "GG "
+    ],
+    "key": {
+        "G": {
+            "item": "minecraft:gold_ingot"
+        },
+        "E": {
+            "item": "minecraft:emerald_block"
+        }
+    },
+    "result": {
+        "item": "invswapper:size_key",
+        "count": 1
+    }
+}
