@@ -61,9 +61,9 @@ public class StatueScreen extends AbstractContainerScreen<StatueContainer> {
 	public StatueScreen(StatueContainer statueContainer, Inventory inventory, Component component) {
 		super(statueContainer, inventory, component);
 		this.imageWidth = 18*9+14;
-		this.imageHeight = 190;
+		this.imageHeight = 100;
 		this.width = 18*9+30+4+10;
-		this.height = 190;
+		this.height = 100;
 		this.inventoryLabelY = this.imageHeight - 93;
 		this.titleLabelX = 8;
 		this.containerInventory = statueContainer.container;
@@ -107,7 +107,7 @@ public class StatueScreen extends AbstractContainerScreen<StatueContainer> {
 
 	public Rectangle getMainAndOffhandBoxBounds() {
 		int mainAndOffhandWidth = 30;
-		return new Rectangle(this.bounds.width+5, getArmorSlotsBoxBounds().height + 5, mainAndOffhandWidth, 30);
+		return new Rectangle(-mainAndOffhandWidth-5, 0, mainAndOffhandWidth, 30);
 	}
 
 	@Override
@@ -128,79 +128,6 @@ public class StatueScreen extends AbstractContainerScreen<StatueContainer> {
 		for(Widget widget : this.renderables) {
 			widget.render(stack, mouseX, mouseY, partialTicks);
 		}
-
-		int i = this.leftPos;
-		int j = this.topPos;
-		RenderSystem.disableDepthTest();
-		PoseStack posestack = RenderSystem.getModelViewStack();
-		posestack.pushPose();
-		posestack.translate(i, j, 0.0D);
-		RenderSystem.applyModelViewMatrix();
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		this.hoveredSlot = null;
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-
-		for(int k = 0; k < this.menu.slots.size(); ++k) {
-			Slot slot = this.menu.slots.get(k);
-			stack.pushPose();
-			RenderSystem.applyModelViewMatrix();
-			stack.translate(slot.x, slot.y, 0.0D);
-			RenderSystem.setShader(GameRenderer::getPositionTexShader);
-			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-			RenderSystem.setShaderTexture(0, UIHelper.UI_RESOURCE);
-			blit(stack, -1, -1, 173, 0, 18, 18);
-			stack.popPose();
-
-			if (slot.isActive()) {
-				RenderSystem.setShader(GameRenderer::getPositionTexShader);
-				this.renderSlot(stack, slot);
-			}
-
-			if (this.isHovering(slot, mouseX, mouseY) && slot.isActive()) {
-				this.hoveredSlot = slot;
-				int l = slot.x;
-				int i1 = slot.y;
-				renderSlotHighlight(stack, l, i1, this.getBlitOffset(), this.getSlotColor(k));
-			}
-		}
-
-		MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.ContainerScreenEvent.DrawForeground(this, stack, mouseX, mouseY));
-		ItemStack itemstack = this.draggingItem.isEmpty() ? this.menu.getCarried() : this.draggingItem;
-		if (!itemstack.isEmpty()) {
-			int l1 = 8;
-			int i2 = this.draggingItem.isEmpty() ? 8 : 16;
-			String s = null;
-			if (!this.draggingItem.isEmpty() && this.isSplittingStack) {
-				itemstack = itemstack.copy();
-				itemstack.setCount(Mth.ceil((float)itemstack.getCount() / 2.0F));
-			} else if (this.isQuickCrafting && this.quickCraftSlots.size() > 1) {
-				itemstack = itemstack.copy();
-				itemstack.setCount(this.quickCraftingRemainder);
-				if (itemstack.isEmpty()) {
-					s = ChatFormatting.YELLOW + "0";
-				}
-			}
-
-			this.renderFloatingItem(itemstack, mouseX - i - 8, mouseY - j - i2, s);
-		}
-
-		if (!this.snapbackItem.isEmpty()) {
-			float f = (float)(Util.getMillis() - this.snapbackTime) / 100.0F;
-			if (f >= 1.0F) {
-				f = 1.0F;
-				this.snapbackItem = ItemStack.EMPTY;
-			}
-
-			int j2 = this.snapbackEnd.x - this.snapbackStartX;
-			int k2 = this.snapbackEnd.y - this.snapbackStartY;
-			int j1 = this.snapbackStartX + (int)((float)j2 * f);
-			int k1 = this.snapbackStartY + (int)((float)k2 * f);
-			this.renderFloatingItem(this.snapbackItem, j1, k1, null);
-		}
-
-		posestack.popPose();
-		RenderSystem.applyModelViewMatrix();
-		RenderSystem.enableDepthTest();
 		this.renderTooltip(stack, mouseX, mouseY);
 	}
 
@@ -293,7 +220,7 @@ public class StatueScreen extends AbstractContainerScreen<StatueContainer> {
 	public void renderText(PoseStack stack) {
 		Font font = this.minecraft.font;
 		font.draw(stack, this.title, this.titleLabelX, this.titleLabelY, 4210752);
-		font.draw(stack, "Inventory", this.inventoryLabelX, this.inventoryLabelY, 4210752);
+//		font.draw(stack, "Inventory", this.inventoryLabelX, this.inventoryLabelY, 4210752);
 	}
 
 	public void renderBackground(PoseStack stack) {
