@@ -1,6 +1,7 @@
 package uk.joshuaepstein.invswapper.container;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -21,12 +22,14 @@ public class StatueContainer extends AbstractContainerMenu {
 	public Inventory container = new Inventory(null);
 	public List<Slot> playerSlots = new ArrayList<>();
 	public Inventory playerInventory;
+	public CompoundTag curiosSlots = new CompoundTag();
 
 	public StatueContainer(int id, Level level, BlockPos pos, Inventory playerInventory) {
 		super(ModContainers.STATUE_CONTAINER, id);
 		this.tilePos = pos;
 		if (level.getBlockEntity(pos) instanceof InvArmorStandBE invArmorStandBE) {
 			container = invArmorStandBE.getInventory();
+			curiosSlots = invArmorStandBE.getCuriosSlots();
 		} else {
 			container = new Inventory(null);
 			throw new IllegalStateException("BlockEntity is not an instance of InvArmorStandBE");

@@ -5,8 +5,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
@@ -15,6 +13,8 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -22,19 +22,31 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fml.ModList;
+import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.CuriosCapability;
+import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
+import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import uk.joshuaepstein.invswapper.InvSwapMod;
 import uk.joshuaepstein.invswapper.client.helper.ScreenDrawHelper;
 import uk.joshuaepstein.invswapper.container.StatueContainer;
+import uk.joshuaepstein.invswapper.container.slot.CuriosReadOnlySlot;
 import uk.joshuaepstein.invswapper.container.slot.ReadOnlySlot;
+import uk.joshuaepstein.invswapper.container.slot.ReadonlyItemStackSlot;
 import uk.joshuaepstein.invswapper.container.slot.player.ArmorViewSlot;
 import uk.joshuaepstein.invswapper.container.slot.player.OffHandSlot;
+import uk.joshuaepstein.invswapper.integration.IntegrationCurios;
 import uk.joshuaepstein.invswapper.util.UIHelper;
 
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class StatueScreen extends AbstractContainerScreen<StatueContainer> {
@@ -46,6 +58,7 @@ public class StatueScreen extends AbstractContainerScreen<StatueContainer> {
 	private final int inventorySlotsNum = 27;
 	private final int armorSlotsNum = 4;
 	private final int hotbarSlotsNum = 9;
+	private int curiosSlotsNum = 0;
 	private final ItemStack draggingItem = ItemStack.EMPTY;
 	protected Rectangle bounds;
 	protected Button selectButton;
@@ -57,6 +70,7 @@ public class StatueScreen extends AbstractContainerScreen<StatueContainer> {
 	private ItemStack snapbackItem = ItemStack.EMPTY;
 	@Nullable
 	private Slot snapbackEnd;
+	CompoundTag curiosNBT = new CompoundTag();
 
 	public StatueScreen(StatueContainer statueContainer, Inventory inventory, Component component) {
 		super(statueContainer, inventory, component);
@@ -68,6 +82,12 @@ public class StatueScreen extends AbstractContainerScreen<StatueContainer> {
 		this.titleLabelX = 8;
 		this.containerInventory = statueContainer.container;
 		this.playerInventory = statueContainer.playerInventory;
+		if (ModList.get().isLoaded("curios")) {
+			curiosSlotsNum = IntegrationCurios.getCuriosItemStacks(inventory.player).size();
+			curiosNBT = statueContainer.curiosSlots;
+		} else {
+			curiosSlotsNum = 0;
+		}
 	}
 
 	protected void init() {
@@ -98,6 +118,9 @@ public class StatueScreen extends AbstractContainerScreen<StatueContainer> {
 		for (int i = 0; i < 9; i++) {
 			this.slots.add(new ReadOnlySlot(this.containerInventory, i, 8 + i * 18, 17 + 58)); // Slot width: 18, Slot height: 18
 		}
+
+		if (ModList.get().isLoaded("curios"))
+			IntegrationCurios.getCuriosItemStacksFromTag(this.curiosNBT).forEach((slot_id, itemStack) -> CuriosApi.getSlotHelper().getSlotType(slot_id.split(":")[0]).ifPresent(slotType -> this.slots.add(new CuriosReadOnlySlot(itemStack, slotType, playerInventory.player, this.getCuriosSlotsBounds().x + 7, this.getCuriosSlotsBounds().y + 7 + (18 * Integer.parseInt(slot_id.split(":")[1])) + (2 * Integer.parseInt(slot_id.split(":")[1]))))));
 	}
 
 	public Rectangle getArmorSlotsBoxBounds() {
@@ -107,7 +130,16 @@ public class StatueScreen extends AbstractContainerScreen<StatueContainer> {
 
 	public Rectangle getMainAndOffhandBoxBounds() {
 		int mainAndOffhandWidth = 30;
-		return new Rectangle(-mainAndOffhandWidth-5, 0, mainAndOffhandWidth, 30);
+		if (ModList.get().isLoaded("curios")) {
+			return new Rectangle(this.bounds.width+5, 30*3+5, mainAndOffhandWidth, 30);
+		} else {
+			return new Rectangle(-mainAndOffhandWidth-5, 0, mainAndOffhandWidth, 30);
+		}
+	}
+
+	public Rectangle getCuriosSlotsBounds() {
+		int curiosSlotsWidth = 30;
+		return new Rectangle(-curiosSlotsWidth-5, 0, curiosSlotsWidth, 30*curiosSlotsNum);
 	}
 
 	@Override
@@ -155,8 +187,8 @@ public class StatueScreen extends AbstractContainerScreen<StatueContainer> {
 		paddingBounds.x -= 5;
 		paddingBounds.width += 10;
 		paddingBounds.height += 10;
-//		UIHelper.drawContainerBordersGUIStyle(this, stack, paddingBounds);
 		UIHelper.drawContainerBordersGUIStyle(this, stack, this.getArmorSlotsBoxBounds());
+		if (ModList.get().isLoaded("curios") && curiosSlotsNum > 0) UIHelper.drawContainerBordersGUIStyle(this, stack, this.getCuriosSlotsBounds());
 		UIHelper.drawContainerBordersGUIStyle(this, stack, this.getMainAndOffhandBoxBounds());
 	}
 
@@ -164,7 +196,6 @@ public class StatueScreen extends AbstractContainerScreen<StatueContainer> {
 		int slotHover = -2130706433;
 		for (Slot slot : this.slots) {
 			if (slot == null) continue;
-//			if (!(slot instanceof ArmorViewSlot || slot instanceof OffHandSlot)) continue;
 			stack.pushPose();
 			RenderSystem.applyModelViewMatrix();
 			stack.translate(slot.x, slot.y, 0.0D);
@@ -173,7 +204,6 @@ public class StatueScreen extends AbstractContainerScreen<StatueContainer> {
 			stack.popPose();
 		}
 		for (Slot slot : this.slots) {
-//			if (!(slot instanceof ArmorViewSlot || slot instanceof OffHandSlot)) continue;
 			if (slot == null) continue;
 			Rectangle box = this.getSlotBox(slot);
 			ItemStack slotStack = slot.getItem();
@@ -192,8 +222,8 @@ public class StatueScreen extends AbstractContainerScreen<StatueContainer> {
 				stack.translate(slot.x, slot.y, 0.0D);
 				Pair<ResourceLocation, ResourceLocation> pair = slot.getNoItemIcon();
 				if (pair != null) {
-					TextureAtlasSprite textureatlassprite = Minecraft.getInstance().getTextureAtlas(pair.getFirst()).apply(pair.getSecond());
-					Minecraft.getInstance().getTextureManager().bindForSetup(textureatlassprite.atlas().location());
+					TextureAtlasSprite textureatlassprite = this.minecraft.getTextureAtlas(pair.getFirst()).apply(pair.getSecond());
+					RenderSystem.setShaderTexture(0, textureatlassprite.atlas().location());
 					blit(stack, 0, 0, this.getBlitOffset(), 16, 16, textureatlassprite);
 				}
 				stack.popPose();

@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 import uk.joshuaepstein.invswapper.init.ModBlocks;
@@ -20,9 +21,11 @@ public class InvSwapMod {
 			return new ItemStack(ModBlocks.INV_ARMOR_STAND);
 		}
 	};
+	public static boolean isCuriosLoaded = false;
 
 	public InvSwapMod() {
 		MinecraftForge.EVENT_BUS.register(this);
+		isCuriosLoaded = ModList.get().isLoaded("curios");
 	}
 
 	public static ResourceLocation id(String name) {

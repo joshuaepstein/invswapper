@@ -1,7 +1,9 @@
 package uk.joshuaepstein.invswapper.block.entity;
 
+import com.google.common.base.Predicates;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
@@ -26,17 +28,28 @@ import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
+import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
+import top.theillusivec4.curios.common.CuriosHelper;
+import uk.joshuaepstein.invswapper.InvSwapMod;
 import uk.joshuaepstein.invswapper.container.StatueContainer;
+import uk.joshuaepstein.invswapper.container.slot.ReadonlyItemStackSlot;
 import uk.joshuaepstein.invswapper.init.ModBlocks;
 import uk.joshuaepstein.invswapper.init.ModItems;
+import uk.joshuaepstein.invswapper.integration.IntegrationCurios;
 
-import java.util.UUID;
+import java.util.*;
+import java.util.function.BiPredicate;
+
+import static uk.joshuaepstein.invswapper.integration.IntegrationCurios.getCuriosItemStacksFromTag;
 
 public class InvArmorStandBE extends SkinnableTileEntity {
 	private UUID owner;
 	private Inventory inventory = new Inventory(null);
+	private CompoundTag curiosSlots = new CompoundTag();
 	private ItemStack standItem;
 	private BlockState stand = Blocks.SMOOTH_STONE_SLAB.defaultBlockState();
 	private boolean isSmall = true;
@@ -45,6 +58,10 @@ public class InvArmorStandBE extends SkinnableTileEntity {
 		super(ModBlocks.INV_ARMOR_STAND_BE, pos, state);
 		this.standItem = new ItemStack(Blocks.SMOOTH_STONE_SLAB);
 		this.owner = null;
+	}
+
+	public CompoundTag getCuriosSlots() {
+		return curiosSlots;
 	}
 
 	public InvArmorStandBE(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -89,6 +106,8 @@ public class InvArmorStandBE extends SkinnableTileEntity {
 			this.stand = NbtUtils.readBlockState(tag.getCompound("Stand"));
 		if (tag.contains("IsSmall"))
 			this.isSmall = tag.getBoolean("IsSmall");
+		if (tag.contains("CuriosInv"))
+			this.curiosSlots = tag.getCompound("CuriosInv");
 	}
 
 	@Override
@@ -105,7 +124,7 @@ public class InvArmorStandBE extends SkinnableTileEntity {
 		if (this.stand.getBlock() != Blocks.SMOOTH_STONE_SLAB)
 			tag.put("Stand", NbtUtils.writeBlockState(this.stand));
 		tag.putBoolean("IsSmall", this.isSmall);
-
+		tag.put("CuriosInv", this.curiosSlots);
 	}
 
 	@Override
@@ -155,6 +174,11 @@ public class InvArmorStandBE extends SkinnableTileEntity {
 				player.experienceLevel -= 1;
 				ListTag invTag = new ListTag();
 				ListTag playerTag = new ListTag();
+				if (InvSwapMod.isCuriosLoaded) {
+					CompoundTag currentCurios = curiosSlots.copy();
+					curiosSlots = IntegrationCurios.getMappedSerializedCuriosItemStacks(player, (player1, stack1) -> true, true);
+					IntegrationCurios.applyMappedSerializedCuriosItemStacks(player, currentCurios, true);
+				}
 				this.inventory.save(invTag);
 				player.getInventory().save(playerTag);
 

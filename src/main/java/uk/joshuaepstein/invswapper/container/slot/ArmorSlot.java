@@ -1,6 +1,7 @@
 package uk.joshuaepstein.invswapper.container.slot;
 
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.EquipmentSlot;
