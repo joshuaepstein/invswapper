@@ -7,6 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -14,7 +15,7 @@ import top.theillusivec4.curios.api.type.ISlotType;
 
 public class CuriosReadOnlySlot extends Slot {
 	ResourceLocation backgroundSlotResource = new ResourceLocation("curios", "textures/gui/empty_armor_slot.png");
-	public CuriosReadOnlySlot(ItemStack stack, ISlotType slotType, Player player, int xPosition, int yPosition) {
+	public CuriosReadOnlySlot(ItemStack stack, @Nullable ISlotType slotType, Player player, int xPosition, int yPosition) {
 		super(new Container() {
 			@Override
 			public int getContainerSize() {
@@ -59,15 +60,16 @@ public class CuriosReadOnlySlot extends Slot {
 			}
 		}, 0, xPosition, yPosition);
 		this.setBackground(InventoryMenu.BLOCK_ATLAS, player.getCommandSenderWorld().isClientSide() ?
-				CuriosApi.getIconHelper().getIcon(slotType.getIdentifier())
-				: new ResourceLocation(Curios.MODID, "item/empty_curio_slot"));
+				slotType != null ? CuriosApi.getIconHelper().getIcon(slotType.getIdentifier()) :
+						new ResourceLocation(Curios.MODID, "item/empty_curio_slot") :
+				new ResourceLocation(Curios.MODID, "item/empty_curio_slot"));
 	}
 
-	public boolean mayPlace(ItemStack stack) {
+	public boolean mayPlace(@NotNull ItemStack stack) {
 		return false;
 	}
 
-	public boolean mayPickup(Player playerIn) {
+	public boolean mayPickup(@NotNull Player playerIn) {
 		return false;
 	}
 }

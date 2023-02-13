@@ -6,15 +6,13 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import uk.joshuaepstein.invswapper.init.ModScreens;
 
-@Mod.EventBusSubscriber(Dist.CLIENT)
+@Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD, value={Dist.CLIENT})
 public class ClientSetupEvents {
 	@SubscribeEvent(priority = EventPriority.LOW)
 	public static void setupClient(FMLClientSetupEvent event) {
-		// ModScreens.register()
-		// ModKeybinds.register()
-		// ModEntityRenderers.register()
 		MinecraftForge.EVENT_BUS.register(InputEvents.class);
-		// ModTooltips.register(event)
+		ModScreens.register();
 	}
 }

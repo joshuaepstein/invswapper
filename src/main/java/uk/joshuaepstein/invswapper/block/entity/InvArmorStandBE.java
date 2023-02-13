@@ -1,9 +1,7 @@
 package uk.joshuaepstein.invswapper.block.entity;
 
-import com.google.common.base.Predicates;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
@@ -28,23 +26,15 @@ import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
-import top.theillusivec4.curios.common.CuriosHelper;
 import uk.joshuaepstein.invswapper.InvSwapMod;
 import uk.joshuaepstein.invswapper.container.StatueContainer;
-import uk.joshuaepstein.invswapper.container.slot.ReadonlyItemStackSlot;
 import uk.joshuaepstein.invswapper.init.ModBlocks;
 import uk.joshuaepstein.invswapper.init.ModItems;
 import uk.joshuaepstein.invswapper.integration.IntegrationCurios;
 
-import java.util.*;
-import java.util.function.BiPredicate;
-
-import static uk.joshuaepstein.invswapper.integration.IntegrationCurios.getCuriosItemStacksFromTag;
+import java.util.UUID;
 
 public class InvArmorStandBE extends SkinnableTileEntity {
 	private UUID owner;
